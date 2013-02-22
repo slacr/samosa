@@ -1,0 +1,83 @@
+PIXEL_SIZE = 3
+colors = {
+  "-" => :tomato,
+  "A" => :blue,
+  "B" => :red,
+  "C" => :cyan,
+  "D" => :orange,
+  "E" => :yellow,
+  "F" => :purple,
+  "G" => :green,
+  "H" => :magenta,
+  "I" => :darkseagreen,
+  "J" => :goldenrod,
+  "K" => :darkgray,
+  "L" => :darkturquoise,
+  "M" => :darkorange,
+  "N" => :darkred,
+  "O" => :deeppink,
+  "P" => :dodgerblue,
+  "Q" => :darkcyan,
+  "R" => :darkorchid,
+  "S" => :indigo,
+  "T" => :lightblue,
+  "U" => :hotpink,
+  "V" => :lightcoral,
+  "W" => :lightsteelblue,
+  "X" => :maroon,
+  "Y" => :limegreen,
+  "Z" => :lightskyblue
+}
+
+filename = ARGV.pop
+
+lines = []
+chars = 0
+File.open("cry.maxiters10.fasta") do |file|
+  file.each_line do |line|
+    chomped = line.chomp
+    chars += chomped.length
+    lines << chomped #unless line[0] == ">"
+  end
+end
+
+
+squaresize = Math.sqrt(chars).ceil
+puts squaresize
+
+set_width squaresize * (PIXEL_SIZE)
+set_height squaresize * (PIXEL_SIZE)
+
+def draw_pixel(x, y, color)
+  # Takes an x, y, and draws pixels  between them
+  x = x * PIXEL_SIZE
+  y = y * PIXEL_SIZE
+
+  (0..PIXEL_SIZE).each do |pos_add|
+    line x, y+pos_add, x+PIXEL_SIZE, y+pos_add, stroke: color
+  end
+end
+
+cur_x = 0
+cur_y = 0
+
+lines.each do |line|
+
+  if line[0] == ">"
+    cur_x = 0
+    cur_y += 3 unless cur_y == 0 # no whitespace at start
+  else
+    line.each_char do |char|
+      char_color = colors[char]
+      draw_pixel(cur_x, cur_y, char_color.to_s)
+      if cur_x == squaresize
+        cur_x = 0
+        cur_y += 1
+      else
+        cur_x += 1
+      end
+    end
+  end
+end
+
+puts ARGV
