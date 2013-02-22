@@ -10,7 +10,7 @@ To use:
 * run the following command:
 
 
-    rasem test.rasem && mogrify -format png test.svg 
+        rasem test.rasem && mogrify -format png test.svg 
 
 
 * move test.png to the right place (cry.maxiters1.png)
