@@ -33,7 +33,7 @@ filename = ARGV.pop
 
 lines = []
 chars = 0
-File.open("cry.maxiters10.fasta") do |file|
+File.open("input.fasta") do |file|
   file.each_line do |line|
     chomped = line.chomp
     chars += chomped.length
