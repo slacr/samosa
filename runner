@@ -1,18 +1,19 @@
 #!/usr/bin/env ruby
+
 file = ARGV.shift
 if file.nil? 
-  puts "Usage: ruby runner.rb file.fasta"
+  puts "Usage: ruby runner.rb sequence.fasta"
   exit -1
 end
 
 puts "Moving file in place..."
 `mv #{file} input.fasta`
-puts "Writing out SVG..."
+puts "Creating SVG file \"test.svg\" from sequence..."
 `rasem test.rasem`
-puts "Converting SVG to PNG..."
+puts "Converting SVG file to PNG file \"#{file}.png\"..."
 `mogrify -format png test.svg`
 `mv test.png #{file}.png`
-puts "Cleaning up..."
+puts "Removing SVG file..."
 `rm test.svg`
 puts "Moving file back..."
 `mv input.fasta #{file}`
