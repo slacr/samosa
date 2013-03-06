@@ -31,22 +31,12 @@ colors = {
 
 filename = ARGV.pop
 
-lines = []
-chars = 0
-File.open("input.fasta") do |file|
-  file.each_line do |line|
-    chomped = line.chomp
-    chars += chomped.length
-    lines << chomped #unless line[0] == ">"
-  end
+contents = ""
+File.open("input.fasta", "rb") do |file|
+  contents = file.read
 end
 
 
-squaresize = Math.sqrt(chars).ceil
-puts squaresize
-
-set_width squaresize * (PIXEL_SIZE)
-set_height squaresize * (PIXEL_SIZE)
 
 def draw_pixel(x, y, color)
   # Takes an x, y, and draws pixels  between them
@@ -58,26 +48,95 @@ def draw_pixel(x, y, color)
   end
 end
 
-cur_x = 0
-cur_y = 0
+maxlength = 0
+sequences = contents.split(/^>.*$/)
+sequences = sequences.map { |seq| seq.sub("\n", "") }
+sequences.each { |sequence| maxlength = sequence.length if (sequence.length >= maxlength) }
+sequences.select! { |sequence| sequence.length != 0 }
 
-lines.each do |line|
+contents.split('>').each do |sequence|
+  #puts "Sequence: #{sequence}, length: #{sequence.length}"
+end
+puts maxlength
 
-  if line[0] == ">"
-    cur_x = 0
-    cur_y += 3 unless cur_y == 0 # no whitespace at start
+color_sequences = []
+sequences.each do |seq|
+  color_sequences << []
+end
+
+puts "Got #{sequences.length} sequences"
+(0..maxlength).each do |char_pos|
+  char_dist = Hash.new(0)
+  sequences.each do |sequence|
+    #puts "#{sequence}"
+    #puts "#{sequence[char_pos]}"
+    char_dist[sequence[char_pos]] += 1
+  end
+  # Have distribution, now find max and print those green. All others print red
+  char_dist.sort_by { |key, value| value }
+  max_pair = char_dist.shift
+  if char_dist.value? max_pair[1]
+    # we have multiple tied for first place
+    color_sequences.each do |color_sequence|
+      # set the current char pos we're at to be grey
+      color_sequence[char_pos] = :darkgray
+    end
   else
-    line.each_char do |char|
-      char_color = colors[char]
-      draw_pixel(cur_x, cur_y, char_color.to_s)
-      if cur_x == squaresize
-        cur_x = 0
-        cur_y += 1
+    sequences.each_index do |index|
+      if sequences[index][char_pos] == max_pair[0]
+        color_sequences[index][char_pos] = :green
       else
-        cur_x += 1
+        color_sequences[index][char_pos] = :tomato
       end
     end
   end
 end
+
+puts color_sequences
+
+# actually draw them
+#
+
+squaresize = Math.sqrt(maxlength).ceil
+puts "SqSize: #{squaresize}"
+
+set_width (squaresize * (PIXEL_SIZE)) + 30
+set_height (squaresize * (PIXEL_SIZE) * sequences.length) + 30
+
+cur_x = 0
+cur_y = 0
+
+color_sequences.each do |color_sequence|
+  color_sequence.each do |color_at_pos|
+    draw_pixel(cur_x, cur_y, color_at_pos.to_s)
+    if cur_x == squaresize
+      cur_x = 0
+      cur_y += 1
+    else
+      cur_x += 1
+    end
+  end
+  cur_x = 0
+  cur_y += 3
+end
+
+#lines.each do |line|
+
+  #if line[0] == ">"
+    #cur_x = 0
+    #cur_y += 3 unless cur_y == 0 # no whitespace at start
+  #else
+    #line.each_char do |char|
+      #char_color = colors[char]
+      #draw_pixel(cur_x, cur_y, char_color.to_s)
+      #if cur_x == squaresize
+        #cur_x = 0
+        #cur_y += 1
+      #else
+        #cur_x += 1
+      #end
+    #end
+  #end
+#end
 
 puts ARGV
