@@ -31,12 +31,9 @@ colors = {
 
 filename = ARGV.pop
 
-contents = ""
 File.open("input.fasta", "rb") do |file|
   contents = file.read
 end
-
-
 
 def draw_pixel(x, y, color)
   # Takes an x, y, and draws pixels  between them
@@ -54,10 +51,6 @@ sequences = sequences.map { |seq| seq.sub("\n", "") }
 sequences.each { |sequence| maxlength = sequence.length if (sequence.length >= maxlength) }
 sequences.select! { |sequence| sequence.length != 0 }
 
-contents.split('>').each do |sequence|
-  #puts "Sequence: #{sequence}, length: #{sequence.length}"
-end
-puts maxlength
 
 color_sequences = []
 sequences.each do |seq|
@@ -68,8 +61,6 @@ puts "Got #{sequences.length} sequences"
 (0..maxlength).each do |char_pos|
   char_dist = Hash.new(0)
   sequences.each do |sequence|
-    #puts "#{sequence}"
-    #puts "#{sequence[char_pos]}"
     char_dist[sequence[char_pos]] += 1
   end
   # Have distribution, now find max and print those green. All others print red
@@ -94,11 +85,9 @@ end
 
 puts color_sequences
 
-# actually draw them
-#
 
+# actually draw them
 squaresize = Math.sqrt(maxlength).ceil
-puts "SqSize: #{squaresize}"
 
 set_width (squaresize * (PIXEL_SIZE)) + 30
 set_height (squaresize * (PIXEL_SIZE) * sequences.length) + 30
@@ -119,24 +108,3 @@ color_sequences.each do |color_sequence|
   cur_x = 0
   cur_y += 3
 end
-
-#lines.each do |line|
-
-  #if line[0] == ">"
-    #cur_x = 0
-    #cur_y += 3 unless cur_y == 0 # no whitespace at start
-  #else
-    #line.each_char do |char|
-      #char_color = colors[char]
-      #draw_pixel(cur_x, cur_y, char_color.to_s)
-      #if cur_x == squaresize
-        #cur_x = 0
-        #cur_y += 1
-      #else
-        #cur_x += 1
-      #end
-    #end
-  #end
-#end
-
-puts ARGV
