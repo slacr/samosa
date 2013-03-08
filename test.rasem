@@ -1,39 +1,14 @@
 PIXEL_SIZE = 3
-colors = {
-  "-" => :tomato,
-  "A" => :blue,
-  "B" => :red,
-  "C" => :cyan,
-  "D" => :orange,
-  "E" => :yellow,
-  "F" => :purple,
-  "G" => :green,
-  "H" => :magenta,
-  "I" => :darkseagreen,
-  "J" => :goldenrod,
-  "K" => :darkgray,
-  "L" => :darkturquoise,
-  "M" => :darkorange,
-  "N" => :darkred,
-  "O" => :deeppink,
-  "P" => :dodgerblue,
-  "Q" => :darkcyan,
-  "R" => :darkorchid,
-  "S" => :indigo,
-  "T" => :lightblue,
-  "U" => :hotpink,
-  "V" => :lightcoral,
-  "W" => :lightsteelblue,
-  "X" => :maroon,
-  "Y" => :limegreen,
-  "Z" => :lightskyblue
-}
+INPUT_FILE = "input.fasta"
+COLOR_RANGE = "10"
+COLOR_HUE = 110
 
-filename = ARGV.pop
-
-File.open("input.fasta", "rb") do |file|
+# Open our sequence file
+contents = ""
+File.open(INPUT_FILE, "rb") do |file|
   contents = file.read
 end
+
 
 def draw_pixel(x, y, color)
   # Takes an x, y, and draws pixels  between them
@@ -66,6 +41,7 @@ puts "Got #{sequences.length} sequences"
   # Have distribution, now find max and print those green. All others print red
   char_dist.sort_by { |key, value| value }
   max_pair = char_dist.shift
+  # If the value of the second most common matches the first
   if char_dist.value? max_pair[1]
     # we have multiple tied for first place
     color_sequences.each do |color_sequence|
