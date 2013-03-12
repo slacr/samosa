@@ -1,7 +1,10 @@
+require 'color'
+
 PIXEL_SIZE = 3
 INPUT_FILE = "input.fasta"
-COLOR_RANGE = "10"
+COLOR_RANGE = 10
 COLOR_HUE = 110
+COLOR_LIGHTNESS = 35
 
 # Open our sequence file
 contents = ""
@@ -20,12 +23,28 @@ def draw_pixel(x, y, color)
   end
 end
 
+# Make each sequence a string in sequences[] and get the max length
 maxlength = 0
 sequences = contents.split(/^>.*$/)
 sequences = sequences.map { |seq| seq.sub("\n", "") }
 sequences.each { |sequence| maxlength = sequence.length if (sequence.length >= maxlength) }
 sequences.select! { |sequence| sequence.length != 0 }
 
+# HSL object (hue,saturation,lightness) is an object representing a color.
+# We'll grade down the saturation from most to least common char in the 
+# distribution, using COLOR_RANGE to determine the number of intervals
+
+# Set our maximum color to have 100% saturation
+max_pair_color = Color::HSL.new(COLOR_HUE, 100, COLOR_LIGHTNESS)
+
+# Put the color value for each interval into color_intervals[]
+color_intervals = [Color::to_rgb(max_pair_color)] # Convert HSL to rgb string
+(0..COLOR_RANGE-1).each do |color_interval|
+  square_color = Color::HSL.new(COLOR_HUE, (100/COLOR_RANGE.ceil * color_interval), COLOR_LIGHTNESS)
+  color_intervals << [Color::to_rgb(square_color)]
+end
+p color_intervals
+exit
 
 color_sequences = []
 sequences.each do |seq|
@@ -46,7 +65,7 @@ puts "Got #{sequences.length} sequences"
     # we have multiple tied for first place
     color_sequences.each do |color_sequence|
       # set the current char pos we're at to be grey
-      color_sequence[char_pos] = :darkgray
+      color_sequence[char_pos] = color_intervals[0]
     end
   else
     sequences.each_index do |index|
