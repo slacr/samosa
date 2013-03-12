@@ -26,7 +26,7 @@ end
 # Make each sequence a string in sequences[] and get the max length
 maxlength = 0
 sequences = contents.split(/^>.*$/)
-sequences = sequences.map { |seq| seq.sub("\n", "") }
+sequences = sequences.map { |seq| seq.gsub("\n", "") }
 sequences.each { |sequence| maxlength = sequence.length if (sequence.length >= maxlength) }
 sequences.select! { |sequence| sequence.length != 0 }
 
