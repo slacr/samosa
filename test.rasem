@@ -2,8 +2,7 @@ require 'color'
 
 PIXEL_SIZE = 3
 INPUT_FILE = "input.fasta"
-COLOR_RANGE = 10
-COLOR_HUE = 110
+COLOR_HUE = 110  # expressed in degrees (110 = green)
 COLOR_LIGHTNESS = 35
 
 # Open our sequence file
@@ -11,7 +10,6 @@ contents = ""
 File.open(INPUT_FILE, "rb") do |file|
   contents = file.read
 end
-
 
 def draw_pixel(x, y, color)
   # Takes an x, y, and draws pixels  between them
@@ -23,25 +21,30 @@ def draw_pixel(x, y, color)
   end
 end
 
-# Make each sequence a string in sequences[] and get the max length
-maxlength = 0
+def get_color_scale(num_sequences)
+  # We'll grade down the saturation from most to least common char in the 
+  # distribution, using num_sequences to determine the number of intervals
+  color_intervals = []
+  (1..num_sequences).each do |color_interval|
+    saturation = (100/num_sequences).ceil * color_interval
+    square_color = Color::HSL.new(COLOR_HUE, saturation, COLOR_LIGHTNESS)
+    color_intervals << square_color.css_rgb # Convert HSL to css rgb string
+  end
+  # index 0 has the least saturation, while index num_sequence has the most
+  return color_intervals
+end
+
+# Remove the sequence header and remove newlines
 sequences = contents.split(/^>.*$/)
 sequences = sequences.map { |seq| seq.gsub("\n", "") }
+# Get the length of the longest sequence
+maxlength = 0 
 sequences.each { |sequence| maxlength = sequence.length if (sequence.length >= maxlength) }
+# Remove empties
 sequences.select! { |sequence| sequence.length != 0 }
 
-# HSL object (hue,saturation,lightness) is an object representing a color.
-# We'll grade down the saturation from most to least common char in the 
-# distribution, using COLOR_RANGE to determine the number of intervals
-
-color_intervals = []
-# Put the color value for each interval into color_intervals[]
-(0..COLOR_RANGE).each do |color_interval|
-  square_color = Color::HSL.new(COLOR_HUE, (100/COLOR_RANGE.ceil * color_interval), COLOR_LIGHTNESS)
-  color_intervals << [square_color.to_rgb] # Convert HSL to rgb string
-end
-p color_intervals
-exit
+# Get an array of color codes for distribution proportions
+color_intervals = get_color_scale(sequences.length)
 
 color_sequences = []
 sequences.each do |seq|
@@ -54,31 +57,18 @@ puts "Got #{sequences.length} sequences"
   sequences.each do |sequence|
     char_dist[sequence[char_pos]] += 1
   end
-  # Have distribution, now find max and print those green. All others print red
-  char_dist.sort_by { |key, value| value }
-  max_pair = char_dist.shift
-  # If the value of the second most common matches the first
-  if char_dist.value? max_pair[1]
-    # we have multiple tied for first place
-    color_sequences.each do |color_sequence|
-      # set the current char pos we're at to be grey
-      color_sequence[char_pos] = color_intervals[0]
-    end
-  else
-    sequences.each_index do |index|
-      if sequences[index][char_pos] == max_pair[0]
-        color_sequences[index][char_pos] = :green
-      else
-        color_sequences[index][char_pos] = :tomato
-      end
-    end
+  # char_dist contains the num of occurences for each char in this position
+
+  # We use the num of occurences to determine the amount of saturation.
+  #   example:  if 'a' occurs 4 times and there's 10 sequences, every 'a'
+  #             in this position gets 40% saturation
+  sequences.each_index do |index|
+    occurences = char_dist[sequences[index][char_pos]]
+    color_sequences[index][char_pos] = color_intervals[occurences-1]
   end
 end
 
-puts color_sequences
-
-
-# actually draw them
+# Use the maxlength to get the size of the drawing for each sequence
 squaresize = Math.sqrt(maxlength).ceil
 
 set_width (squaresize * (PIXEL_SIZE)) + 30
