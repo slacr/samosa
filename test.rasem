@@ -34,14 +34,11 @@ sequences.select! { |sequence| sequence.length != 0 }
 # We'll grade down the saturation from most to least common char in the 
 # distribution, using COLOR_RANGE to determine the number of intervals
 
-# Set our maximum color to have 100% saturation
-max_pair_color = Color::HSL.new(COLOR_HUE, 100, COLOR_LIGHTNESS)
-
+color_intervals = []
 # Put the color value for each interval into color_intervals[]
-color_intervals = [Color::to_rgb(max_pair_color)] # Convert HSL to rgb string
-(0..COLOR_RANGE-1).each do |color_interval|
+(0..COLOR_RANGE).each do |color_interval|
   square_color = Color::HSL.new(COLOR_HUE, (100/COLOR_RANGE.ceil * color_interval), COLOR_LIGHTNESS)
-  color_intervals << [Color::to_rgb(square_color)]
+  color_intervals << [square_color.to_rgb] # Convert HSL to rgb string
 end
 p color_intervals
 exit
