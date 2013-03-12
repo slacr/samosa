@@ -1,6 +1,6 @@
 require 'color'
 
-PIXEL_SIZE = 3
+PIXEL_SIZE = 1  # not really necessary? just increase density in svg conversion
 INPUT_FILE = "input.fasta"
 COLOR_HUE = 110  # expressed in degrees (110 = green)
 COLOR_LIGHTNESS = 35

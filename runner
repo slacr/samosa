@@ -7,13 +7,12 @@ if file.nil?
 end
 
 puts "Moving file in place..."
-`mv #{file} input.fasta`
+system("mv --update #{file} input.fasta")
 puts "Creating SVG file \"test.svg\" from sequence..."
-`rasem test.rasem`
+system("rasem test.rasem")
 puts "Converting SVG file to PNG file \"#{file}.png\"..."
-`mogrify -format png test.svg`
-`mv test.png #{file}.png`
+system("convert -density 700 test.svg #{file}.png")
 puts "Removing SVG file..."
-`rm test.svg`
+system("rm test.svg")
 puts "Moving file back..."
-`mv input.fasta #{file}`
+system("mv --update input.fasta #{file}")
