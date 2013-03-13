@@ -1,6 +1,5 @@
 require 'color'
 
-PIXEL_SIZE = 1  # not really necessary? just increase density in svg conversion
 INPUT_FILE = "input.fasta"
 COLOR_HUE = 110  # expressed in degrees (110 = green)
 COLOR_LIGHTNESS = 35
@@ -12,12 +11,9 @@ File.open(INPUT_FILE, "rb") do |file|
 end
 
 def draw_pixel(x, y, color)
-  # Takes an x, y, and draws pixels  between them
-  x = x * PIXEL_SIZE
-  y = y * PIXEL_SIZE
-
-  (0..PIXEL_SIZE).each do |pos_add|
-    line x, y+pos_add, x+PIXEL_SIZE, y+pos_add, stroke: color
+  # Takes an x, y, and a color
+  (0..1).each do |pos_add|
+    line x, y+pos_add, x+1, y+pos_add, stroke: color
   end
 end
 
@@ -71,8 +67,8 @@ end
 # Use the maxlength to get the size of the drawing for each sequence
 squaresize = Math.sqrt(maxlength).ceil
 
-set_width (squaresize * (PIXEL_SIZE)) + 30
-set_height (squaresize * (PIXEL_SIZE) * sequences.length) + 30
+set_width squaresize + 30
+set_height (squaresize * sequences.length) + 30
 
 cur_x = 0
 cur_y = 0
