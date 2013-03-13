@@ -1,18 +1,41 @@
 #!/usr/bin/env ruby
+require 'trollop'
+
+opts = Trollop::options do
+  version "samosa runner 0.0.0.420, (c) 1874 the SLACR"
+  banner <<-EOS
+Use this runner program to draw graphical versions of gene sequences with SAMOSA.
+
+Usage:
+   runner [options] <sequence-file>
+options available:
+EOS
+
+  opt :density, "Width of the final png image in DPI", :default => 700  
+  opt :keep_svg, "Do not delete svg file"
+end
+Trollop::die :density, "must be non-negative" if opts[:density] < 0
 
 file = ARGV.shift
-if file.nil? 
-  puts "Usage: ruby runner.rb sequence.fasta"
-  exit -1
-end
 
+raise Trollop::HelpNeeded if file.nil?
+
+# Still reallky honky that we have to hardcode the filename in test.rasem and
+# rename it here. Gotta fix before it drives me nuts
 puts "Moving file in place..."
 system("mv --update #{file} input.fasta")
-puts "Creating SVG file \"test.svg\" from sequence..."
+puts "Creating SVG file 'test.svg' from sequence..."
 system("rasem test.rasem")
-puts "Converting SVG file to PNG file \"#{file}.png\"..."
-system("convert -density 700 test.svg #{file}.png")
-puts "Removing SVG file..."
-system("rm test.svg")
+# Use imagemagick to convert the svg to png and the specified DPI
+puts "Converting SVG file to PNG file '#{file}.png'..."
+system("convert -density #{opts[:density]} test.svg #{file}.png")
+# In the case you want to keep the svg, use the --keep-svg flag
+if opts[:keep_svg]
+  puts "Keeping SVG as '#{file}.svg'..."
+  system("mv --update test.svg #{file}.svg")
+else
+  puts "Removing SVG file..."
+  system("rm test.svg")
+end
 puts "Moving file back..."
 system("mv --update input.fasta #{file}")
