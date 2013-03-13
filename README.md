@@ -1,17 +1,21 @@
 samosa
 ======
-
-Statistical Analysis Map Of Statistical Analyses
+## Statistical Analysis Map Of Statistical Analyses
 
 To use:
 
-* install rasem and imagemagick
-* edit test.rasem to open your sequence file
-* run the following command:
+* make sure imagemagick >=6.8 is installed
+* gem install rasem, color, trollop
+* use the runner with your sequence file:
 
 
-        rasem test.rasem && mogrify -format png test.svg 
+        ruby runner [options] sequence.file
 
+# CLI options
 
-* move test.png to the right place (cry.maxiters1.png)
-* open in ur fav browser
+     --density, -d <i>:  Integer i specifies the width of the final png image in DPI,
+                         default is 700 (DPI roughly corresponds to PPI on most monitors)
+        --keep-svg, -k:  Do not delete the .svg file after creating the .png
+
+* after passing sequence.file, the final image file will be named sequence.file.png
+* open in ur fav browser or imageviewer
