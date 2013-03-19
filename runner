@@ -1,5 +1,7 @@
 #!/usr/bin/env ruby
-require 'trollop'
+require 'rubygems'
+require 'bundler/setup'
+require './test.rasem'
 
 opts = Trollop::options do
   version "samosa runner 0.0.0.420, (c) 1874 the SLACR"
