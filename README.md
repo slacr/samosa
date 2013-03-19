@@ -5,9 +5,8 @@ samosa
 To use:
 
 * make sure imagemagick >=6.8 is installed
-* gem install rasem, color, trollop
+* run `bundle install`  (check Gemfile for the required gems)
 * use the runner with your sequence file:
-
 
         ruby runner [options] sequence.file
 
