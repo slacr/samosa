@@ -4,12 +4,6 @@ INPUT_FILE = "input.fasta"
 COLOR_HUE = 110  # expressed in degrees (110 = green)
 COLOR_LIGHTNESS = 35
 
-# Open our sequence file
-contents = ""
-File.open(INPUT_FILE, "rb") do |file|
-  contents = file.read
-end
-
 def draw_pixel(x, y, color)
   # Takes an x, y, and a color
   (0..1).each do |pos_add|
@@ -30,6 +24,12 @@ def get_color_scale(num_sequences)
   return color_intervals
 end
 
+# Open our sequence file
+contents = ""
+File.open(INPUT_FILE, "rb") do |file|
+  contents = file.read
+end
+
 # Remove the sequence header and remove newlines
 sequences = contents.split(/^>.*$/)
 sequences = sequences.map { |seq| seq.gsub("\n", "") }
@@ -39,27 +39,36 @@ sequences.each { |sequence| maxlength = sequence.length if (sequence.length >= m
 # Remove empties
 sequences.select! { |sequence| sequence.length != 0 }
 
-# Get an array of color codes for distribution proportions
+puts "Got #{sequences.length} sequences"
+
+# char_dist is an array that contains a Hash for every position. Every Hash
+# maps a character to its occurences for that position.
+char_dist = []
+(0..(maxlength-1)).each do |char_pos|
+  pos_dist = Hash.new(0)
+  sequences.each do |sequence|
+    pos_dist[sequence[char_pos]] += 1
+  end
+  char_dist << pos_dist
+end
+
+# Get an array of color codes for each level of frequency
 color_intervals = get_color_scale(sequences.length)
 
+# color_sequences is an array of arrays, containing the color values for 
+# each position in each sequence. It's used to draw the final image.
 color_sequences = []
-sequences.each do |seq|
+sequences.each do
   color_sequences << []
 end
 
-puts "Got #{sequences.length} sequences"
-(0..maxlength).each do |char_pos|
-  char_dist = Hash.new(0)
-  sequences.each do |sequence|
-    char_dist[sequence[char_pos]] += 1
-  end
-  # char_dist contains the num of occurences for each char in this position
-
-  # We use the num of occurences to determine the amount of saturation.
-  #   example:  if 'a' occurs 4 times and there's 10 sequences, every 'a'
-  #             in this position gets 40% saturation
-  sequences.each_index do |index|
-    occurences = char_dist[sequences[index][char_pos]]
+# Gets the character at each position in each sequence, then finds that 
+# character's occurences for that position. Uses the number of occurences
+# to determine that pixel's color in color_sequences.
+sequences.each_index do |index|
+  (0..maxlength).each do |char_pos|
+    character = sequences[index][char_pos]
+    occurences = char_dist[char_pos][character]
     color_sequences[index][char_pos] = color_intervals[occurences-1]
   end
 end
