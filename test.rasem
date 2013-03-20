@@ -39,7 +39,40 @@ sequences.each { |sequence| maxlength = sequence.length if (sequence.length >= m
 # Remove empties
 sequences.select! { |sequence| sequence.length != 0 }
 
+# Use the maxlength to get the size of the drawing for each sequence
+squaresize = Math.sqrt(maxlength).ceil
+
 puts "Got #{sequences.length} sequences"
+
+# Create a regex string to split our sequences.
+seq_regex = ""
+(0..squaresize).each { seq_regex << '(.)' }
+# splitted is an array containing an array for each sequence. Each of these 
+# sequence arrays in turn contain arrays of their nucleotides, with a length 
+# no more than squaresize.
+splitted = []
+sequences.each do |sequence|
+  splitted << sequence.scan(Regexp.new seq_regex)
+end
+
+# sequence_tables is a string meant for HTML. Every sequence gets a <table>, 
+# and every <tr> has a length of squaresize. Every nucleotide is surrounded 
+# by <td> tags.
+#
+# ...maybe this should be done in an erb/haml file.
+sequence_tables = ""
+splitted.each do |sequence|
+  sequence_tables << "<table>"
+  sequence.each do |row|
+    sequence_tables << "<tr>"
+    row.each do |nucleotide|
+      sequence_tables << "<td>" << nucleotide << "</td>"
+    end.join("</tr>")
+  end.join("</table>")
+end
+
+#p sequence_tables
+#exit
 
 # char_dist is an array that contains a Hash for every position. Every Hash
 # maps a character to its occurences for that position.
@@ -73,8 +106,6 @@ sequences.each_index do |index|
   end
 end
 
-# Use the maxlength to get the size of the drawing for each sequence
-squaresize = Math.sqrt(maxlength).ceil
 
 set_width squaresize + 30
 set_height (squaresize * sequences.length) + 30
