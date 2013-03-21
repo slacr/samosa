@@ -44,15 +44,14 @@ squaresize = Math.sqrt(maxlength).ceil
 
 puts "Got #{sequences.length} sequences"
 
-# Create a regex string to split our sequences.
-seq_regex = ""
-(0..squaresize).each { seq_regex << '(.)' }
 # splitted is an array containing an array for each sequence. Each of these 
-# sequence arrays in turn contain arrays of their nucleotides, with a length 
-# no more than squaresize.
+# sequence arrays in turn contain arrays of their nucleotides, each with a 
+# length <= squaresize, which represents each row in the final image.
 splitted = []
 sequences.each do |sequence|
-  splitted << sequence.scan(Regexp.new seq_regex)
+  seq_array = []
+  sequence.chars.each_slice(squaresize) { |row| seq_array << row }
+  splitted << seq_array
 end
 
 # sequence_tables is a string meant for HTML. Every sequence gets a <table>, 
