@@ -11,4 +11,7 @@ $( document ).ready(function() {
       $(this).addClass("char-" + inuc); 
     });
   });
+
+  var char_freq = jQuery.parseJSON(char_dist);
+  alert(char_freq);
 });

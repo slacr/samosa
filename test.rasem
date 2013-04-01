@@ -73,15 +73,15 @@ end
 #p sequence_tables
 #exit
 
-# char_dist is an array that contains a Hash for every position. Every Hash
+# $char_dist is an array that contains a Hash for every position. Every Hash
 # maps a character to its occurences for that position.
-char_dist = []
+$char_dist = []
 (0..(maxlength-1)).each do |char_pos|
   pos_dist = Hash.new(0)
   sequences.each do |sequence|
     pos_dist[sequence[char_pos]] += 1
   end
-  char_dist << pos_dist
+  $char_dist << pos_dist
 end
 
 # Get an array of color codes for each level of frequency
@@ -100,7 +100,7 @@ end
 sequences.each_index do |index|
   (0..(maxlength-1)).each do |char_pos|
     character = sequences[index][char_pos]
-    occurences = char_dist[char_pos][character]
+    occurences = $char_dist[char_pos][character]
     color_sequences[index][char_pos] = color_intervals[occurences-1]
   end
 end
